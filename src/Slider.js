@@ -147,6 +147,11 @@ export default class Slider extends PureComponent {
     minTrackStyle: ViewPropTypes.style,
 
     /**
+     * Component to use for the thumb
+     */
+    thumbComponent: PropTypes.object,
+
+    /**
      * The style applied to the thumb.
      */
     thumbStyle: ViewPropTypes.style,
@@ -259,6 +264,7 @@ export default class Slider extends PureComponent {
       style,
       trackStyle,
       minTrackStyle,
+      thumbComponent,
       thumbStyle,
       debugTouchArea,
       onValueChange,
@@ -337,8 +343,9 @@ export default class Slider extends PureComponent {
             },
           ]}
         >
-          {this._renderThumbImage()}
-          {this._renderThumbText()}
+          {thumbComponent}
+          {!thumbComponent && this._renderThumbImage()}
+          {!thumbComponent && this._renderThumbText()}
         </Animated.View>
         <View
           renderToHardwareTextureAndroid
