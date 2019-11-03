@@ -142,6 +142,11 @@ export default class Slider extends PureComponent {
     trackStyle: ViewPropTypes.style,
 
     /**
+     * The style applied to the track on the left of the slider.
+     */
+    minTrackStyle: ViewPropTypes.style,
+
+    /**
      * The style applied to the thumb.
      */
     thumbStyle: ViewPropTypes.style,
@@ -253,6 +258,7 @@ export default class Slider extends PureComponent {
       styles,
       style,
       trackStyle,
+      minTrackStyle,
       thumbStyle,
       debugTouchArea,
       onValueChange,
@@ -294,7 +300,7 @@ export default class Slider extends PureComponent {
       width: Animated.add(minimumTrackWidth, thumbSize.width / 2),
       backgroundColor: minimumTrackTintColor,
       ...valueVisibleStyle,
-    };
+    }
 
     const touchOverflowStyle = this._getTouchOverflowStyle();
 
@@ -315,7 +321,7 @@ export default class Slider extends PureComponent {
         />
         <Animated.View
           renderToHardwareTextureAndroid
-          style={[mainStyles.track, trackStyle, minimumTrackStyle]}
+          style={[mainStyles.track, trackStyle, minimumTrackStyle, minTrackStyle]}
         />
         {this._renderGraduations(mainStyles, valueVisibleStyle)}
         <Animated.View
