@@ -93,6 +93,8 @@ thumbStyle            | [style](http://facebook.github.io/react-native/docs/view
 thumbImage            | [source](http://facebook.github.io/react-native/docs/image.html#source)    | Yes      |                           | Sets an image for the thumb.
 thumbText             | string   | Yes      |                           | Set a text for the thumb.
 thumbTextStyle        | [style](http://facebook.github.io/react-native/docs/view.html#style)    | Yes      |                           | The style applied to the thumb text
+graduations            | number   | Yes      | 0                         | Number of graduations to display on the slider. The value should be between 2 and `maximumValue`
+graduationStyle        | [style](http://facebook.github.io/react-native/docs/view.html#style)    | Yes      |                           | The style applied to the graduations
 debugTouchArea        | bool     | Yes      | false                     | Set this to true to visually see the thumb touch rect in green.
 animateTransitions    | bool     | Yes      | false                     | Set to true if you want to use the default 'spring' animation
 animationType         | string   | Yes      | 'timing'                  | Set to 'spring' or 'timing' to use one of those two types of animations with the default [animation properties](https://facebook.github.io/react-native/docs/animations.html).

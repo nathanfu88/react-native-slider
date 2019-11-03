@@ -16,6 +16,8 @@ import PropTypes from 'prop-types';
 
 const TRACK_SIZE = 4;
 const THUMB_SIZE = 20;
+const GRADUATION_HEIGHT = 10;
+const GRADUATION_WIDTH = 3;
 
 function Rect(x, y, width, height) {
   this.x = x;
@@ -160,6 +162,18 @@ export default class Slider extends PureComponent {
     thumbTextStyle: Text.propTypes.style,
 
     /**
+     * Graduation value of the slider to display a reguliar vertical tick.
+     * The value should be between 0 and (maximumValue - minimumValue).
+     * Default value is 0
+     */
+    graduations: PropTypes.number,
+
+    /**
+     * The style applied to the graduation.
+     */
+    graduationStyle: ViewPropTypes.style,
+
+    /**
      * Set this to true to visually see the thumb touch rect in green.
      */
     debugTouchArea: PropTypes.bool,
@@ -192,6 +206,7 @@ export default class Slider extends PureComponent {
     debugTouchArea: false,
     animationType: 'timing',
     thumbTextStyle: {},
+    graduations: 0
   };
 
   constructor(props) {
@@ -201,6 +216,7 @@ export default class Slider extends PureComponent {
       containerSize: { width: 0, height: 0 },
       trackSize: { width: 0, height: 0 },
       thumbSize: { width: 0, height: 0 },
+      graduationSize: { width: 0, height: 0 },
       allMeasured: false,
       value: new Animated.Value(props.value),
     };
@@ -243,6 +259,8 @@ export default class Slider extends PureComponent {
       thumbTouchSize,
       animationType,
       animateTransitions,
+      graduations,
+      graduationStyle,
       ...other
     } = this.props;
     const {
@@ -250,6 +268,7 @@ export default class Slider extends PureComponent {
       containerSize,
       trackSize,
       thumbSize,
+      graduationSize,
       allMeasured,
     } = this.state;
     const mainStyles = styles || defaultStyles;
@@ -298,6 +317,7 @@ export default class Slider extends PureComponent {
           renderToHardwareTextureAndroid
           style={[mainStyles.track, trackStyle, minimumTrackStyle]}
         />
+        {this._renderGraduations(mainStyles, valueVisibleStyle)}
         <Animated.View
           onLayout={this._measureThumb}
           renderToHardwareTextureAndroid
@@ -335,6 +355,7 @@ export default class Slider extends PureComponent {
       style,
       trackStyle,
       thumbStyle,
+      graduationStyle,
       ...otherProps
     } = props;
 
@@ -392,6 +413,10 @@ export default class Slider extends PureComponent {
     this._handleMeasure('thumbSize', x);
   };
 
+  _measureGraduations = (x: Object) => {
+    this._handleMeasure('graduationSize', x);
+  };
+
   _handleMeasure = (name: string, x: Object) => {
     const { width, height } = x.nativeEvent.layout;
     const size = { width, height };
@@ -412,9 +437,20 @@ export default class Slider extends PureComponent {
         containerSize: this._containerSize,
         trackSize: this._trackSize,
         thumbSize: this._thumbSize,
+        graduationSize: this._graduationSize,
         allMeasured: true,
       });
     }
+  };
+
+  _getGraduationOffset = (index: number) => {
+    const { graduations } = this.props;
+    const { graduationSize, thumbSize, trackSize } = this.state;
+
+    return (
+      index * ((trackSize.width - thumbSize.width) / (graduations - 1)) +
+        (graduationSize.width / 2)
+    );
   };
 
   _getRatio = (value: number) =>
@@ -586,6 +622,30 @@ export default class Slider extends PureComponent {
 
     return <Image source={thumbImage} />;
   };
+
+  _renderGraduations = (mainStyles, valueVisibleStyle) => {
+    const { graduations, maximumTrackTintColor, graduationStyle } = this.props;
+    const { trackSize, graduationSize } = this.state;
+
+    if (graduations <= 1) return;
+
+    return (
+      [...Array(graduations)].map((x, i) =>
+        <Animated.View
+          key={i}
+          onLayout={this._measureGraduations}
+          style={[
+            {
+              backgroundColor: maximumTrackTintColor,
+              marginTop: -(trackSize.height + graduationSize.height) / 2
+            },
+            mainStyles.graduation, graduationStyle,
+            { left: this._getGraduationOffset(i), ...valueVisibleStyle }
+          ]}
+        />
+      )
+    )
+  }
 }
 
 var defaultStyles = StyleSheet.create({
@@ -619,5 +679,10 @@ var defaultStyles = StyleSheet.create({
   thumbText: {
     color: 'white',
     fontSize: 10,
+  },
+  graduation: {
+    position: 'absolute',
+    height: GRADUATION_HEIGHT,
+    width: GRADUATION_WIDTH,
   },
 });
