@@ -90,6 +90,7 @@ onSlidingComplete     | function | Yes      |                           | Callba
 style                 | [style](http://facebook.github.io/react-native/docs/view.html#style)    | Yes      |                           | The style applied to the slider container
 trackStyle            | [style](http://facebook.github.io/react-native/docs/view.html#style)    | Yes      |                           | The style applied to the track
 minTrackStyle            | [style](http://facebook.github.io/react-native/docs/view.html#style)    | Yes      |                           | The style applied to the track on the left-hand side of the slider
+thumbComponent        | [Component](https://facebook.github.io/react-native/docs/components-and-apis#basic-components)    | Yes      |                           | Component to render as the slider indicator. **_Note: Be sure to set your component `width` and `height` with the `thumbStyle` property for this to work. Disclaimeer: this feature was not heavily tested_**
 thumbStyle            | [style](http://facebook.github.io/react-native/docs/view.html#style)    | Yes      |                           | The style applied to the thumb
 thumbImage            | [source](http://facebook.github.io/react-native/docs/image.html#source)    | Yes      |                           | Sets an image for the thumb.
 thumbText             | string   | Yes      |                           | Set a text for the thumb.
