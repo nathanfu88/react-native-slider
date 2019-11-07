@@ -7,6 +7,7 @@ declare module 'react-native-slider' {
     StyleProp,
     TimingAnimationConfig,
     ViewStyle,
+    TextStyle
   } from 'react-native'
 
   interface SliderProps {
@@ -24,7 +25,7 @@ declare module 'react-native-slider' {
      * If true the user won't be able to move the slider.
      * Default value is false.
      */
-    disabled: boolean
+    disabled?: boolean
 
     /**
      * Initial minimum value of the slider. Default value is 0.
@@ -71,7 +72,7 @@ declare module 'react-native-slider' {
     /**
      * Callback continuously called while the user is dragging the slider.
      */
-    onValueChange: (value: number) => void
+    onValueChange?: (value: number) => void
 
     /**
      * Callback called when the user starts changing the value (e.g. when
@@ -96,6 +97,16 @@ declare module 'react-native-slider' {
     trackStyle?: StyleProp<ViewStyle>
 
     /**
+     * The style applied to the track on the left of the slider.
+     */
+    minTrackStyle?: StyleProp<ViewStyle>
+
+    /**
+     * Component to use for the thumb
+     */
+    thumbComponent?: JSX.Element
+
+    /**
      * The style applied to the thumb.
      */
     thumbStyle?: StyleProp<ViewStyle>
@@ -104,6 +115,29 @@ declare module 'react-native-slider' {
      * Sets an image for the thumb.
      */
     thumbImage?: ImageSourcePropType
+
+    /**
+     * Sets a text for the thumb
+     */
+    thumbText?: string
+
+    /**
+     * Sets a style for the thumb text
+     */
+    thumbTextStyle?: StyleProp<TextStyle>
+
+    /**
+     * Graduation value of the slider to display a reguliar vertical tick.
+     * The value should be between 0 and (maximumValue - minimumValue).
+     * Default value is 0
+     */
+    graduations?: number
+
+    /**
+     * The style applied to the graduation.
+     */
+    graduationStyle?: StyleProp<ViewStyle>
+
 
     /**
      * Set this to true to visually see the thumb touch rect in green.
