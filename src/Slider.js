@@ -462,7 +462,7 @@ export default class Slider extends PureComponent {
     const { graduationSize, thumbSize, trackSize } = this.state;
 
     return (
-      index * ((trackSize.width - thumbSize.width) / (graduations - 1)) +
+      index * ((trackSize.width - thumbSize.width) / (graduations - 2)) +
         (graduationSize.width / 2)
     );
   };
