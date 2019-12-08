@@ -18,6 +18,7 @@ const TRACK_SIZE = 4;
 const THUMB_SIZE = 20;
 const GRADUATION_HEIGHT = 10;
 const GRADUATION_WIDTH = 3;
+const MIN_GRADUATION_MARGIN = 6;
 
 function Rect(x, y, width, height) {
   this.x = x;
@@ -459,11 +460,20 @@ export default class Slider extends PureComponent {
 
   _getGraduationOffset = (index: number) => {
     const { graduations } = this.props;
-    const { graduationSize, thumbSize, trackSize } = this.state;
+    const { graduationSize, trackSize } = this.state;
 
+    const drawableWidth = trackSize.width - MIN_GRADUATION_MARGIN * 2 -
+      ((graduationSize.width / 2) * 2);
+    const gradSeparation = Math.round(drawableWidth / (graduations - 1));
+
+    if (index === 0) {
+      return MIN_GRADUATION_MARGIN;
+    }
+    if (index === graduations - 1) {
+      return trackSize.width - MIN_GRADUATION_MARGIN - graduationSize.width;
+    }
     return (
-      index * ((trackSize.width - thumbSize.width) / (graduations - 1)) +
-        (graduationSize.width / 2)
+      MIN_GRADUATION_MARGIN + index * gradSeparation
     );
   };
 
@@ -581,6 +591,7 @@ export default class Slider extends PureComponent {
   _thumbHitTest = (e: Object) => {
     const nativeEvent = e.nativeEvent;
     const thumbTouchRect = this._getThumbTouchRect();
+
     return thumbTouchRect.containsPoint(
       nativeEvent.locationX,
       nativeEvent.locationY,
