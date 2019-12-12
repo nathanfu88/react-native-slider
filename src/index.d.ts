@@ -158,6 +158,11 @@ declare module 'react-native-slider' {
      * Used to configure the animation parameters.  These are the same parameters in the Animated library.
      */
     animationConfig?: SpringAnimationConfig | TimingAnimationConfig
+
+    /**
+     * Callback for when a slider animation completes
+     */
+    onAnimationComplete?: () => void
   }
 
   const Slider: ComponentClass<SliderProps>
