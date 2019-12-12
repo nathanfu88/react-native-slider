@@ -203,6 +203,11 @@ export default class Slider extends PureComponent {
      * Used to configure the animation parameters.  These are the same parameters in the Animated library.
      */
     animationConfig: PropTypes.object,
+
+    /**
+     * Callback for when a slider animation completes
+     */
+    onAnimationComplete: PropTypes.func,
   };
 
   static defaultProps = {
@@ -279,9 +284,7 @@ export default class Slider extends PureComponent {
     const {
       value,
       containerSize,
-      trackSize,
       thumbSize,
-      graduationSize,
       allMeasured,
     } = this.state;
     const mainStyles = styles || defaultStyles;
@@ -538,7 +541,7 @@ export default class Slider extends PureComponent {
       },
     );
 
-    Animated[animationType](this.state.value, animationConfig).start();
+    Animated[animationType](this.state.value, animationConfig).start(this.props.onAnimationComplete);
   };
 
   _fireChangeEvent = event => {
