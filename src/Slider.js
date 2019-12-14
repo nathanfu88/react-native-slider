@@ -296,11 +296,13 @@ export default class Slider extends PureComponent {
         : [-thumbWidthHalf, containerSize.width - thumbWidthHalf],
       // extrapolate: 'clamp',
     });
-    const minimumTrackWidth = value.interpolate({
-      inputRange: [minimumValue, maximumValue],
-      outputRange: [0, containerSize.width - thumbWidthHalf],
-      // extrapolate: 'clamp',
-    });
+    const minimumTrackWidth = (minimumValue === maximumValue && this.props.value === minimumValue) ?
+      containerSize.width - thumbWidthHalf :
+      value.interpolate({
+        inputRange: [minimumValue, maximumValue],
+        outputRange: [0, containerSize.width - thumbWidthHalf],
+        // extrapolate: 'clamp',
+      });
     const valueVisibleStyle = {};
     if (!allMeasured) {
       valueVisibleStyle.opacity = 0;
@@ -469,6 +471,9 @@ export default class Slider extends PureComponent {
       ((graduationSize.width / 2) * 2);
     const gradSeparation = Math.round(drawableWidth / (graduations - 1));
 
+    if (graduations === 1) {
+      return trackSize.width - graduationSize.width - MIN_GRADUATION_MARGIN;
+    }
     if (index === 0) {
       return MIN_GRADUATION_MARGIN;
     }
@@ -655,7 +660,7 @@ export default class Slider extends PureComponent {
     const { graduations, maximumTrackTintColor, graduationStyle } = this.props;
     const { trackSize, graduationSize } = this.state;
 
-    if (graduations <= 1) return;
+    if (graduations < 1) return;
 
     return (
       [...Array(graduations)].map((x, i) =>
