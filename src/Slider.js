@@ -222,7 +222,8 @@ export default class Slider extends PureComponent {
     debugTouchArea: false,
     animationType: 'timing',
     thumbTextStyle: {},
-    graduations: 0
+    graduations: 0,
+    graduationSize: { width: GRADUATION_WIDTH, GRADUATION_HEIGHT: GRADUATION_HEIGHT },
   };
 
   constructor(props) {
@@ -232,7 +233,7 @@ export default class Slider extends PureComponent {
       containerSize: { width: 0, height: 0 },
       trackSize: { width: 0, height: 0 },
       thumbSize: { width: 0, height: 0 },
-      graduationSize: { width: 0, height: 0 },
+      graduationSize: { width: props.graduationStyle.width, height: props.graduationStyle.height },
       allMeasured: false,
       value: new Animated.Value(props.value),
     };
@@ -433,10 +434,6 @@ export default class Slider extends PureComponent {
     this._handleMeasure('thumbSize', x);
   };
 
-  _measureGraduations = (x: Object) => {
-    this._handleMeasure('graduationSize', x);
-  };
-
   _handleMeasure = (name: string, x: Object) => {
     const { width, height } = x.nativeEvent.layout;
     const size = { width, height };
@@ -457,7 +454,6 @@ export default class Slider extends PureComponent {
         containerSize: this._containerSize,
         trackSize: this._trackSize,
         thumbSize: this._thumbSize,
-        graduationSize: this._graduationSize,
         allMeasured: true,
       });
     }
@@ -472,7 +468,7 @@ export default class Slider extends PureComponent {
     const gradSeparation = Math.round(drawableWidth / (graduations - 1));
 
     if (graduations === 1) {
-      return trackSize.width - graduationSize.width - MIN_GRADUATION_MARGIN;
+      return trackSize.width - MIN_GRADUATION_MARGIN - graduationSize.width;
     }
     if (index === 0) {
       return MIN_GRADUATION_MARGIN;
@@ -666,7 +662,6 @@ export default class Slider extends PureComponent {
       [...Array(graduations)].map((x, i) =>
         <Animated.View
           key={i}
-          onLayout={this._measureGraduations}
           style={[
             {
               backgroundColor: maximumTrackTintColor,
