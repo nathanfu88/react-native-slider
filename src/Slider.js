@@ -290,13 +290,15 @@ export default class Slider extends PureComponent {
     } = this.state;
     const mainStyles = styles || defaultStyles;
     const thumbWidthHalf = thumbSize.width / 2;
-    const thumbLeft = value.interpolate({
-      inputRange: [minimumValue, maximumValue],
-      outputRange: I18nManager.isRTL
-        ? [0, -(containerSize.width - thumbWidthHalf)]
-        : [-thumbWidthHalf, containerSize.width - thumbWidthHalf],
-      // extrapolate: 'clamp',
-    });
+    const thumbLeft = (minimumValue === maximumValue && this.props.value === minimumValue) ?
+      containerSize.width - thumbWidthHalf :
+      value.interpolate({
+        inputRange: [minimumValue, maximumValue],
+        outputRange: I18nManager.isRTL
+          ? [0, -(containerSize.width - thumbWidthHalf)]
+          : [-thumbWidthHalf, containerSize.width - thumbWidthHalf],
+        // extrapolate: 'clamp',
+      });
     const minimumTrackWidth = (minimumValue === maximumValue && this.props.value === minimumValue) ?
       containerSize.width - thumbWidthHalf :
       value.interpolate({
