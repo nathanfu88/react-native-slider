@@ -20,22 +20,6 @@ const GRADUATION_HEIGHT = 10;
 const GRADUATION_WIDTH = 3;
 const MIN_GRADUATION_MARGIN = 6;
 
-function Rect(x, y, width, height) {
-  this.x = x;
-  this.y = y;
-  this.width = width;
-  this.height = height;
-}
-
-Rect.prototype.containsPoint = function(x, y) {
-  return (
-    x >= this.x &&
-    y >= this.y &&
-    x <= this.x + this.width &&
-    y <= this.y + this.height
-  );
-};
-
 const DEFAULT_ANIMATION_CONFIGS = {
   spring: {
     friction: 7,
@@ -148,6 +132,11 @@ export default class Slider extends PureComponent {
     minTrackStyle: ViewPropTypes.style,
 
     /**
+     * Horizontal offsetting applied to the track without affecting the thumb.
+     */
+    trackOffset: PropTypes.number,
+
+    /**
      * Component to use for the thumb
      */
     thumbComponent: PropTypes.object,
@@ -221,6 +210,7 @@ export default class Slider extends PureComponent {
     thumbTouchSize: { width: 40, height: 40 },
     debugTouchArea: false,
     animationType: 'timing',
+    trackOffset: 0,
     thumbTextStyle: {},
     graduations: 0,
     graduationSize: { width: GRADUATION_WIDTH, GRADUATION_HEIGHT: GRADUATION_HEIGHT },
@@ -270,6 +260,7 @@ export default class Slider extends PureComponent {
       styles,
       style,
       trackStyle,
+      trackOffset,
       minTrackStyle,
       thumbComponent,
       thumbStyle,
@@ -290,15 +281,13 @@ export default class Slider extends PureComponent {
     } = this.state;
     const mainStyles = styles || defaultStyles;
     const thumbWidthHalf = thumbSize.width / 2;
-    const thumbLeft = (minimumValue === maximumValue && this.props.value === minimumValue) ?
-      containerSize.width - thumbWidthHalf :
-      value.interpolate({
-        inputRange: [minimumValue, maximumValue],
-        outputRange: I18nManager.isRTL
-          ? [0, -(containerSize.width - thumbWidthHalf)]
-          : [-thumbWidthHalf, containerSize.width - thumbWidthHalf],
-        // extrapolate: 'clamp',
-      });
+    const thumbLeft = value.interpolate({
+      inputRange: [minimumValue, maximumValue],
+      outputRange: I18nManager.isRTL
+        ? [0, -(containerSize.width - thumbSize.width)]
+        : [0, containerSize.width - thumbSize.width],
+      // extrapolate: 'clamp',
+    });
     const minimumTrackWidth = (minimumValue === maximumValue && this.props.value === minimumValue) ?
       containerSize.width - thumbWidthHalf :
       value.interpolate({
@@ -313,10 +302,12 @@ export default class Slider extends PureComponent {
 
     const minimumTrackStyle = {
       position: 'absolute',
-      width: Animated.add(minimumTrackWidth, thumbSize.width / 2),
+      left: trackOffset,
+      width: Animated.add(minimumTrackWidth, thumbSize.width / 2 - trackOffset),
       backgroundColor: minimumTrackTintColor,
       ...valueVisibleStyle,
     }
+    const maximumTrackStyle = trackOffset ? { marginHorizontal: trackOffset } : {}
 
     const touchOverflowStyle = this._getTouchOverflowStyle();
 
@@ -331,6 +322,7 @@ export default class Slider extends PureComponent {
             { backgroundColor: maximumTrackTintColor },
             mainStyles.track,
             trackStyle,
+            maximumTrackStyle,
           ]}
           renderToHardwareTextureAndroid
           onLayout={this._measureTrack}
@@ -387,9 +379,11 @@ export default class Slider extends PureComponent {
 
   _handleStartShouldSetPanResponder = (
     e: Object /* gestureState: Object */,
-  ): boolean =>
+  ): boolean => {
     // Should we become active when the user presses down on the thumb?
-    this._thumbHitTest(e);
+    return true
+    // this._thumbHitTest(e);
+  }
 
   _handleMoveShouldSetPanResponder(/* e: Object, gestureState: Object */): boolean {
     // Should we become active when the user moves a touch over the thumb?
@@ -462,7 +456,7 @@ export default class Slider extends PureComponent {
   };
 
   _getGraduationOffset = (index: number) => {
-    const { graduations } = this.props;
+    const { graduations, trackOffset } = this.props;
     const { graduationSize, trackSize } = this.state;
 
     const drawableWidth = trackSize.width - MIN_GRADUATION_MARGIN * 2 -
@@ -470,16 +464,16 @@ export default class Slider extends PureComponent {
     const gradSeparation = Math.round(drawableWidth / (graduations - 1));
 
     if (graduations === 1) {
-      return trackSize.width - MIN_GRADUATION_MARGIN - graduationSize.width;
+      return trackOffset + trackSize.width - MIN_GRADUATION_MARGIN - graduationSize.width;
     }
     if (index === 0) {
-      return MIN_GRADUATION_MARGIN;
+      return trackOffset + MIN_GRADUATION_MARGIN;
     }
     if (index === graduations - 1) {
-      return trackSize.width - MIN_GRADUATION_MARGIN - graduationSize.width;
+      return trackOffset + trackSize.width - MIN_GRADUATION_MARGIN - graduationSize.width;
     }
     return (
-      MIN_GRADUATION_MARGIN + index * gradSeparation
+      trackOffset + MIN_GRADUATION_MARGIN + index * gradSeparation
     );
   };
 
@@ -594,44 +588,10 @@ export default class Slider extends PureComponent {
     return touchOverflowStyle;
   };
 
-  _thumbHitTest = (e: Object) => {
-    const nativeEvent = e.nativeEvent;
-    const thumbTouchRect = this._getThumbTouchRect();
-
-    return thumbTouchRect.containsPoint(
-      nativeEvent.locationX,
-      nativeEvent.locationY,
-    );
-  };
-
-  _getThumbTouchRect = () => {
-    const state = this.state;
-    const props = this.props;
-    const touchOverflowSize = this._getTouchOverflowSize();
-
-    return new Rect(
-      touchOverflowSize.width / 2 +
-        this._getThumbLeft(this._getCurrentValue()) +
-        (state.thumbSize.width - props.thumbTouchSize.width) / 2,
-      touchOverflowSize.height / 2 +
-        (state.containerSize.height - props.thumbTouchSize.height) / 2,
-      props.thumbTouchSize.width,
-      props.thumbTouchSize.height,
-    );
-  };
-
-  _renderDebugThumbTouchRect = thumbLeft => {
-    const thumbTouchRect = this._getThumbTouchRect();
-    const positionStyle = {
-      left: thumbLeft,
-      top: thumbTouchRect.y,
-      width: thumbTouchRect.width,
-      height: thumbTouchRect.height,
-    };
-
+  _renderDebugThumbTouchRect = () => {
     return (
-      <Animated.View
-        style={[defaultStyles.debugThumbTouchArea, positionStyle]}
+      <View
+        style={[defaultStyles.debugThumbTouchArea]}
         pointerEvents="none"
       />
     );
@@ -702,7 +662,8 @@ var defaultStyles = StyleSheet.create({
     bottom: 0,
   },
   debugThumbTouchArea: {
-    position: 'absolute',
+    width: '100%',
+    height: '100%',
     backgroundColor: 'green',
     opacity: 0.5,
   },
