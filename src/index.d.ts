@@ -97,6 +97,11 @@ declare module 'react-native-slider' {
     trackStyle?: StyleProp<ViewStyle>
 
     /**
+     * Horizontal offsetting applied to the track without affecting the thumb.
+     */
+    trackOffset?: number
+
+    /**
      * The style applied to the track on the left of the slider.
      */
     minTrackStyle?: StyleProp<ViewStyle>
