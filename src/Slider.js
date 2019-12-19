@@ -277,22 +277,26 @@ export default class Slider extends PureComponent {
       value,
       containerSize,
       thumbSize,
+      graduationSize,
       allMeasured,
     } = this.state;
     const mainStyles = styles || defaultStyles;
     const thumbWidthHalf = thumbSize.width / 2;
+    const thumbLeftMinOutput = MIN_GRADUATION_MARGIN;
+    const thumbLeftMaxOutput = containerSize.width - thumbSize.width - MIN_GRADUATION_MARGIN;
     const thumbLeft = value.interpolate({
       inputRange: [minimumValue, maximumValue],
       outputRange: I18nManager.isRTL
-        ? [0, -(containerSize.width - thumbSize.width)]
-        : [0, containerSize.width - thumbSize.width],
+        ? [-thumbLeftMinOutput, -thumbLeftMaxOutput]
+        : [thumbLeftMinOutput, thumbLeftMaxOutput],
       // extrapolate: 'clamp',
     });
+    
     const minimumTrackWidth = (minimumValue === maximumValue && this.props.value === minimumValue) ?
       containerSize.width - thumbWidthHalf :
       value.interpolate({
         inputRange: [minimumValue, maximumValue],
-        outputRange: [0, containerSize.width - thumbWidthHalf],
+        outputRange: [0, containerSize.width - thumbSize.width],
         // extrapolate: 'clamp',
       });
     const valueVisibleStyle = {};
@@ -300,9 +304,17 @@ export default class Slider extends PureComponent {
       valueVisibleStyle.opacity = 0;
     }
 
-    const minTrackWidth = (this.props.value === minimumValue) ?
+    let minTrackWidth = (this.props.value === minimumValue) ?
       minimumTrackWidth :
       Animated.add(minimumTrackWidth, thumbWidthHalf - trackOffset);
+    // Special use case for HDx to align track to graduations, but only if there is no thumb
+    if (thumbStyle.backgroundColor === "transparent" && thumbStyle.width === 0) {
+      // this.props.value should already be mapped to a graduation
+      const gradOffset = this._getGraduationOffset(this.props.value);
+      // Convert offset to width
+      minTrackWidth = gradOffset - trackOffset + graduationSize.width + MIN_GRADUATION_MARGIN;
+    }
+
     const minimumTrackStyle = {
       position: 'absolute',
       left: trackOffset,
@@ -384,8 +396,7 @@ export default class Slider extends PureComponent {
     e: Object /* gestureState: Object */,
   ): boolean => {
     // Should we become active when the user presses down on the thumb?
-    return true
-    // this._thumbHitTest(e);
+    return !this.props.disabled;
   }
 
   _handleMoveShouldSetPanResponder(/* e: Object, gestureState: Object */): boolean {
