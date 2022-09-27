@@ -7,12 +7,13 @@ import {
   PanResponder,
   View,
   Easing,
-  ViewPropTypes,
   I18nManager,
   Text,
 } from 'react-native';
 
 import PropTypes from 'prop-types';
+
+import { ImagePropTypes, TextPropTypes, ViewPropTypes } from 'deprecated-react-native-prop-types';
 
 const TRACK_SIZE = 4;
 const THUMB_SIZE = 20;
@@ -149,7 +150,7 @@ export default class Slider extends PureComponent {
     /**
      * Sets an image for the thumb.
      */
-    thumbImage: Image.propTypes.source,
+    thumbImage: ImagePropTypes.source,
 
     /**
      * Sets a text for the thumb
@@ -159,7 +160,7 @@ export default class Slider extends PureComponent {
     /**
      * Sets a style for the thumb text
      */
-    thumbTextStyle: Text.propTypes.style,
+    thumbTextStyle: TextPropTypes.style,
 
     /**
      * Graduation value of the slider to display a reguliar vertical tick.

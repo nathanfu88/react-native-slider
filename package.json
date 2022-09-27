@@ -1,6 +1,6 @@
 {
   "name": "react-native-slider",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "A pure JavaScript <Slider /> component for react-native",
   "main": "lib/Slider.js",
   "typings": "src/index",
@@ -33,6 +33,7 @@
   "devDependencies": {
     "babel-cli": "^6.6.5",
     "babel-eslint": "^7.2.1",
+    "deprecated-react-native-prop-types": "^2.3.0",
     "eslint": "^3.19.0",
     "eslint-plugin-react": "^6.10.3",
     "react": "16.0.0-alpha.6",
